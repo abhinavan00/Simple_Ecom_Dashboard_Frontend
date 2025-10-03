@@ -1,9 +1,102 @@
-import React from "react";
+import React, { useState } from "react";
+import { Link } from "react-router-dom";
 
 const Login = () => {
+    // State to hold log in data
+    const [logInData, setLogInData] = useState({
+        email: '',
+        password: ''
+    });
+
+    // state to handle errors
+    const [error, setError] = useState(null);
+
+    // Helper function to update the state, if any changes happen
+    const handleChange = (e) => {
+        setLogInData({
+            ...logInData, // keep existing data
+            [e.target.name]: e.target.value 
+        });
+        // clear any preveous error if user starts typing
+        setError(null);
+    }
+
+    // Placeholder for submission logic
+    const handleSubmit = (e) => {
+        e.prevantDefault();
+        console.log('Log In attempt with:', logInData);
+        // Logic to call API will go here
+    }
+
     return (
-        <div style={{padding: '20px', maxWidth: '400px', margin: '50px auto', border: '1px solid #ccc', borderRadius: '8px'}}>
-            <h2>User Login</h2>
+        // Outer Container
+        <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
+            {/* Form Card */}
+            <div className="w-full max-w-md bg-white p-8 rounded-xl shadow-2xl">
+
+                <h2 className="text-3xl font-bold text-gray-900 mb-6 text-center">
+                    User Login
+                </h2>
+
+                {/* Display Error Message if State has one */}
+                {error && (
+                    <p className="p-3 mb-4 text-sm text-red-700 bg-red-100 rounded-lg">
+                        {error}
+                    </p>
+                )}
+
+                {/* Form Structure */}
+                <form onSubmit={handleSubmit} className="space-y-6">
+
+                    {/* Email Input Group  */}
+                    <div>
+                        <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
+                            Email
+                        </label>
+                        <input 
+                            type="email"
+                            id="email"
+                            name="email"
+                            value={logInData.email}
+                            onChange={handleChange}
+                            required
+                            className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                            placeholder="Enter Your Registered Email"
+                        />
+                    </div>
+                    {/* Password Input Group */}
+                    <div>
+                        <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
+                            Password
+                        </label>
+                        <input 
+                            type="password"
+                            id="password"
+                            name="password"
+                            value={logInData.password}
+                            onChange={handleChange}
+                            required
+                            className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                            placeholder="Enter Password"
+                        />
+                    </div>
+                    <button 
+                        type="submit"
+                        className="w-full flex justify-center px-4 py-2 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition duration-150 ease-in-out"
+                    >
+                        Sign In
+                    </button>
+                </form>
+
+                {/* Register Link */}
+                <p className="mt-6 text-center text-sm text-gray-600">
+                    Don't have an account?
+                    <Link to='/register' className="font-medium text-indigo-600 hover:underline hover:text-indigo-500 ml-1">
+                        Create One
+                    </Link>
+                </p>
+
+            </div>
         </div>
     )
 }
