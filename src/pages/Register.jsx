@@ -4,7 +4,11 @@ import axios from "axios";
 
 // Backend server URL
 const API_BASE_URL = 'http://localhost:3001';
+
 const Register = () => {
+    // useNavigate to redrict the user
+    const navigate = useNavigate();
+
     // state to hold the form data
     const [formData, setFormData] = useState({
         name: '',
@@ -14,6 +18,8 @@ const Register = () => {
 
     // state to handle potential errors
     const [error, setError] = useState(null);
+    // state to handle loading
+    const [isLoading, setIsLoading] = useState(false);
 
     // Helper function to update state when any input changes
     const handleChange = (e) => {
@@ -26,10 +32,37 @@ const Register = () => {
     }
 
     // Placeholder for submission logic
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault(); // Prevent the default browser form submission
-        console.log('Register attemped with', formData);
-        // Logic to call API will go here
+        setError(null);
+        setIsLoading(true); // start loading
+        
+        try {
+            // Post request to backend /register route
+            const response = await axios.post(`${API_BASE_URL}/register`, formData);
+
+            //check the server response
+            if (response.status === 201) {
+                // Alert the User
+                alert('Registeration Successfull!')
+
+                // Navigate the user to the Login Page
+                navigate('/login');
+            }
+        } catch (error) {
+            // Handle errors from the backend
+            if (error.response && error.response.data) {
+                // Display error message from the server
+                setError(error.response.data.message || error.response.data);
+            } else {
+                // Handle Network and other potential errors
+                setError('Regirstration Failed! Plase try after sometime.');
+            }
+
+        } finally {
+            // Stop Loading regardless of success or failure.
+            setIsLoading(false); 
+        }
     }
 
     return (
@@ -104,9 +137,11 @@ const Register = () => {
                     </div>
                     <button 
                         type="submit" 
-                        className="w-full flex justify-center px-4 py-2 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition duration-150 ease-in-out" 
+                        className="w-full flex justify-center px-4 py-2 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition duration-150 ease-in-out cursor-pointer"
+                        disabled={isLoading} // Disable the button while Loading 
                     >
-                        Register
+                        {/* Display Loading text if in Progress */}
+                        {isLoading? 'Registering...' : 'Register'}
                     </button>
                 </form>
 

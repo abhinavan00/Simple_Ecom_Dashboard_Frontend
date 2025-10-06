@@ -32,7 +32,7 @@ const Login = () => {
 
     // Placeholder for submission logic
     const handleSubmit = async (e) => {
-        e.prevantDefault();
+        e.preventDefault();
         setError(null);
         setIsLoading(true); // start loading
 
@@ -46,7 +46,7 @@ const Login = () => {
                 localStorage.setItem('authToken', response.data.token);
 
                 // Navigate the user to the dashboard route
-                navigate('/api/dashboard/data')
+                navigate('/')
             }
 
         } catch (error) {
@@ -60,7 +60,7 @@ const Login = () => {
             }
         } finally {
             // Stop reccoring either login sucess or failed.
-            setIsLoading(fasl);
+            setIsLoading(false);
         }
     }
 
