@@ -1,7 +1,14 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import axios from "axios";
+
+// The URL for the backend server
+const API_BASE_URL = 'http://localhost:3001'; 
 
 const Login = () => {
+    // useNavigate hook to redirect the user
+    const navigate = useNavigate();
+
     // State to hold log in data
     const [logInData, setLogInData] = useState({
         email: '',
@@ -10,6 +17,8 @@ const Login = () => {
 
     // state to handle errors
     const [error, setError] = useState(null);
+    // state to handle loading
+    const [isLoading, setIsLoading] = useState(false);
 
     // Helper function to update the state, if any changes happen
     const handleChange = (e) => {
@@ -22,10 +31,37 @@ const Login = () => {
     }
 
     // Placeholder for submission logic
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.prevantDefault();
-        console.log('Log In attempt with:', logInData);
-        // Logic to call API will go here
+        setError(null);
+        setIsLoading(true); // start loading
+
+        try {
+            // Post request to backend log in route
+            const response = await axios.post(`${API_BASE_URL}/login`, logInData);
+
+            // Check the response
+            if (response.status === 201 && response.data.token) {
+                // store the jwt token securely in local storage
+                localStorage.setItem('authToken', response.data.token);
+
+                // Navigate the user to the dashboard route
+                navigate('/api/dashboard/data')
+            }
+
+        } catch (error) {
+            // Handle error from the backend
+            if (error.response && error.response.data) {
+                // Display the specific error from the backend server
+                setError(error.response.data.message || error.response.data);
+            } else {
+                // handle other unexpleected Newprk or 
+                setError('Login Failed, Please try again after some time.')
+            }
+        } finally {
+            // Stop reccoring either login sucess or failed.
+            setIsLoading(fasl);
+        }
     }
 
     return (

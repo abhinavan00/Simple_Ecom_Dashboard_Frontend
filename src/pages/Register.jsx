@@ -1,6 +1,9 @@
 import React, {useState} from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import axios from "axios";
 
+// Backend server URL
+const API_BASE_URL = 'http://localhost:3001';
 const Register = () => {
     // state to hold the form data
     const [formData, setFormData] = useState({
