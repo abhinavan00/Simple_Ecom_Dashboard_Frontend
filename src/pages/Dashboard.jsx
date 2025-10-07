@@ -1,6 +1,18 @@
 import React, {useState, useEffect} from "react";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
+import { data, useNavigate } from "react-router-dom";
+import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend } from "chart.js";
+import { Bar } from "react-chartjs-2";
+
+// Register the Necessary components from chart.js
+ChartJS.register(
+    CategoryScale,
+    LinearScale,
+    BarElement,
+    Title,
+    Tooltip,
+    Legend
+)
 
 // Backend server URL
 const API_BASE_URL = 'http://localhost:3001';
@@ -89,16 +101,154 @@ const Dashboard = () => {
     const formatCurrency = (value) => {`$${Number(value).toFixed(2)}`}
     const formatRoas = (value) => Number(value).toFixed(2);
 
+    // --- CHART DATA AND OPTIONS ---
+    const chartData = {
+        // We only have one data point (Last 7 days) for MVP
+        labels: ['Last 7 Days'],
+        datasets: [
+            {
+                label: 'Total Sales (USD)',
+                data: [metrics.TotalSales],
+                backgroundColor: 'rgba(79, 70, 229, 0.6)',
+                borderColor: 'rgba(79, 70, 229, 1)',
+                borderWidth: 1,
+                yAxisID: 'y' // Primary axis
+            },
+            {
+                label: 'Total Ad Spend (USD',
+                data: [metrics.TotalAdSpend],
+                backgroundColor: 'rgba(236, 72, 153, 0.6)',
+                borderColor: 'rgba(236, 72, 153, 1)',
+                borderWidth: 1,
+                yAxisID: 'y'
+            },
+        ],
+    };
+
+    const chartOptions = {
+        responsive: true,
+        maintainAspectRatio: false, // Allows the chart container to define the size
+        plugins: {
+            legend: {
+                position: 'top',
+            },
+            title: {
+                display: true,
+                text: 'Sales vs. Ad Spend Comparison',
+                font: {
+                    size: 16
+                }
+            },
+        },
+        scales: {
+            y: {
+                type: 'linear',
+                display: true,
+                position: 'left',
+                title: {
+                    display: true,
+                    text: 'Amount (USD)'
+                },
+                beginAtZero: true,
+            },
+            x: {
+                grid: {
+                    display: false,
+                },
+            }
+        },
+    };
+
+    // --- ROAS Chart Data & Options (Horizontal Bar Meter) ---
+    const roasValue = metrics.TotalAdSpend > 0 ? metrics.ROAS : 0 ;
+    const roasTarget = 4.0; // A good business ROAS Target to visualize against
+
+    const roasChartData = {
+        labels: ['ROAS'],
+        datasets: [
+            {
+                label: 'ROAS Achieved',
+                data: [roasValue],
+                backgroundColor: roasValue >= roasTarget ? 'rgba(34, 197, 94, 0.8)' : 'rgba(239, 68, 68, 0.8)', // Green or Red based on performance
+                borderColor: roasValue >= roasTarget ? 'rgb(34, 197, 94)' : 'rgb(239, 68, 68)',
+                borderWidth: 1,
+                // Custom bar thickness to make it look like a meter
+                barThickness: 30,
+            },
+        ],
+    };
+
+    const roasChartOptions = {
+        indexAxis: 'y', // Make it a horizontal bar
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: {
+                display: false,
+            },
+            title: {
+                display: true,
+                text: `ROAS Performance (Target: ${roasTarget.toFixed(2)}:1)`,
+                font: {
+                    size: 16
+                }
+            },
+        },
+        scales: {
+            x: {
+                min: 0,
+                max: roasTarget * 2, // Set max scale to double the target for context
+                title: {
+                    display: true,
+                    text: 'Return on Ad Spend (ROAS)',
+                },
+                grid: {
+                    display: true,
+                },
+                // Add a line for the Target Goal
+                ticks: {
+                    callback: function(value, index, values) {
+                        return value === roasTarget ? 'Target' : value;
+                    },
+                },
+            },
+            y: {
+                grid: {
+                    display: false,
+                },
+            }
+        },
+    };
+
     return (
         <div className="min-h-screen bg-gray-50 p-8">
-            <h1 className="text-4xl font-extrabold text-gray-900 mb-8 border-b pb-4">E-commerce Dashboard</h1>
 
-            <div className="mb-6 text-lg text-gray-600 font-medium">
-                Metrics For: <span className="text-indigo-600">{metrics.TimePeriod}</span>
-            </div>
+            {/* HEADER STRUCTURE */}
+            <header className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 border-b pb-4">
+                {/* Title and Time Period */}
+                <div>
+                    <h1 className="text-4xl font-extrabold text-gray-900 mb-2">E-commerce Dashboard</h1>
+                    <div className="text-lg text-gray-600 font-medium">
+                        Metrics For: <span className="text-indigo-600">{metrics.TimePeriod}</span>
+                    </div>
+                </div>
+
+                {/* Logout Button */}
+                <div className="mt-4 md:mt-0 w-full md:w-auto">
+                    <button
+                        onClick={() => {
+                            localStorage.removeItem('authToken');
+                            navigate('/login');
+                        }}
+                        className="w-full md:w-40 py-3 px-4 bg-red-600 text-white font-semibold rounded-lg shadow-md hover:bg-red-700 transition duration-150 cursor-pointer"
+                    >
+                        Logout
+                    </button>
+                </div>
+            </header>
 
             {/* Dashboard Metrics Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-3 gap-6">
 
                 {/* Card 1: Total Sales */}
                 <div className="bg-white p-6 rounded-xl shadow-lg border-l-4 border-indigo-500">
@@ -120,18 +270,37 @@ const Dashboard = () => {
                     </p>
                 </div>
 
-                {/* Card 4: Log Out Button */}
-                <div className="bg-gray-100 p-6 rounded-xl shadow-lg flex items-center justify-center">
-                    <button
-                        onClick={() => {
-                            localStorage.removeItem('authToken');
-                            navigate('/login');
-                        }}
-                        className="w-full py-3 bg-red-600 text-white font-semibold rounded-lg shadow-md hover:bg-red-700 transition duration-150 cursor-pointer"
-                    >
-                        Logout
-                    </button>
+            </div>
+
+            {/* Chart Visualization Section */}
+            <div className="mt-10 grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+                {/* Left Side: Sales vs. Spend Chart (Bar) */}
+                <div className="bg-white p-6 rounded-xl shadow-2xl">
+                    <h3 className="text-xl font-bold text-gray-900 mb-4">Sales vs. Ad Spend</h3>
+                    <div className="h-96">
+                        <Bar data={chartData} options={chartOptions} />
+                    </div>
                 </div>
+
+                {/* Right Side: ROAS Visualization (Meter) */}
+                <div className="bg-white p-6 rounded-xl shadow-2xl">
+                        <h3 className="text-xl font-bold text-gray-900 mb-4">ROAS Goal Tracker</h3>
+                        <div className="h-96 flex items-center justify-center">
+                            {/* Display the ROAS value prominently */}
+                            <div className="text-center w-full">
+                                <p className="text-6xl font-extrabold" style={{ color: roasValue >= roasTarget ? 'rgb(34, 197, 94)' : 'rgb(239, 68, 68)' }}>
+                                    {roasValue.toFixed(2)}:1
+                                </p>
+                                <p className="text-gray-500 mt-2">Achieved ROAS (Target: {roasTarget.toFixed(2)}:1)</p>
+                                
+                                {/* ROAS Meter Chart (Optional - a visual enhancement) */}
+                                <div className="mt-8 mx-auto w-3/4">
+                                    <Bar data={roasChartData} options={roasChartOptions} />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
 
             </div>
 

@@ -118,9 +118,10 @@ const Login = () => {
                     </div>
                     <button 
                         type="submit"
-                        className="w-full flex justify-center px-4 py-2 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition duration-150 ease-in-out"
+                        className="w-full flex justify-center px-4 py-2 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition duration-150 ease-in-out cursor-pointer"
                     >
-                        Sign In
+                        {/* Display Loading text if in progress */}
+                        {isLoading? 'Signing In' : 'Sign In'}
                     </button>
                 </form>
 
