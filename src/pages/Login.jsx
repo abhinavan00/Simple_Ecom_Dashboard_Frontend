@@ -38,12 +38,15 @@ const Login = () => {
 
         try {
             // Post request to backend log in route
-            const response = await axios.post(`${API_BASE_URL}/login`, logInData);
+            // Set `withCredentials: true` to allow axios to send/receive cookies from backend domain
+            const response = await axios.post(`${API_BASE_URL}/login`, logInData, {
+                withCredentials: true,
+            });
 
             // Check the response
-            if (response.status === 201 && response.data.token) {
+            if (response.status === 201) {
                 // store the jwt token securely in local storage
-                localStorage.setItem('authToken', response.data.token);
+                // ** REMOVE:** localStorage.setItem('authToken', response.data.token);
 
                 // Navigate the user to the dashboard route
                 navigate('/')

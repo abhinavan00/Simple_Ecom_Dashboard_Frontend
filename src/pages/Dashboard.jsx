@@ -26,22 +26,16 @@ const Dashboard = () => {
     // function to fetch the protected data
     const fetchDashboardData = async () => {
         // get auth token from local storage
-        const token = localStorage.getItem('authToken');
+        // --REMOVE: const token = localStorage.getItem('authToken'); ---
 
         // check if token exist
-        if (!token) {
-            console.error('No authentication code found, Redirecting to Log In!');
-            navigate('/login');
-            return;
-        }
+        // --- REMOVE: if (!token) { ... navigate('/login'); return; } ---
 
         try {
             // Make authenticated request to /dashboard route
+            // Set `withCredentials: true` to send cookie
             const response = await axios.get(`${API_BASE_URL}`, {
-                headers: {
-                    // Send JWT as a Bearer Token to Autherization Header
-                    'Authorization': `Bearer ${token}`
-                }
+                withCredentials: true,
             });
             
             // Store the fetch data
@@ -87,7 +81,7 @@ const Dashboard = () => {
                 </button>
             </div>
         );
-    }
+    };
 
     // Default Data structure if API returns null or 0s (for preveting system from crash)
     const metrics = dashboardData || {
@@ -220,6 +214,17 @@ const Dashboard = () => {
         },
     };
 
+    // Helper function for Logout
+    const handleLogout = async() => {
+       try {
+            await axios.post(`${API_BASE_URL}/logout`, {}, {withCredentials: true});
+            navigate('/login');
+       } catch (err) {
+            console.error('Logout Failed', err);
+            navigate('/login');
+       }
+    } 
+
     return (
         <div className="min-h-screen bg-gray-50 p-8">
 
@@ -236,10 +241,7 @@ const Dashboard = () => {
                 {/* Logout Button */}
                 <div className="mt-4 md:mt-0 w-full md:w-auto">
                     <button
-                        onClick={() => {
-                            localStorage.removeItem('authToken');
-                            navigate('/login');
-                        }}
+                        onClick={handleLogout}
                         className="w-full md:w-40 py-3 px-4 bg-red-600 text-white font-semibold rounded-lg shadow-md hover:bg-red-700 transition duration-150 cursor-pointer"
                     >
                         Logout
