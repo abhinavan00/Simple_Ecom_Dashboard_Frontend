@@ -7,17 +7,17 @@ import Dashboard from './pages/Dashboard'
 function App() {
   return (
     <Router>
-      <Routes>
-        {/* The main route will be the Dashboard (Protected inside the component) */}
-        <Route path='/' element={<Dashboard />} />
+        <Routes>
+          {/* The main route will be the Dashboard (Protected inside the component) */}
+          <Route path='/' element={<Dashboard />} />
 
-        {/* Authentication Route */}
-        <Route path='/login' element={<Login />} />
-        <Route path='/register' element={<Register />} />
+          {/* Authentication Route */}
+          <Route path='/login' element={<Login />} />
+          <Route path='/register' element={<Register />} />
 
-        {/* Optional: Redirect any unknown path to the dashboard or login */}
-        <Route path='*' element={<Navigate to='/' /> } /> 
-      </Routes>
+          {/* Optional: Redirect any unknown path to the dashboard or login */}
+          <Route path='*' element={<Navigate to='/' /> } /> 
+        </Routes>
     </Router>
   )
 }
