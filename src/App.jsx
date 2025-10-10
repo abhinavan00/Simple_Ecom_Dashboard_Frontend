@@ -3,13 +3,21 @@ import { BrowserRouter as Router , Routes, Route, Navigate } from 'react-router-
 import Login from './pages/Login'
 import Register from './pages/Register'
 import Dashboard from './pages/Dashboard'
+import ProtectedRoute from './components/ProtectedRoute'
 
 function App() {
   return (
     <Router>
         <Routes>
           {/* The main route will be the Dashboard (Protected inside the component) */}
-          <Route path='/' element={<Dashboard />} />
+          <Route 
+            path='/' 
+            element={
+              <ProtectedRoute>
+                <Dashboard />
+              </ProtectedRoute>
+            }   
+          />
 
           {/* Authentication Route */}
           <Route path='/login' element={<Login />} />
