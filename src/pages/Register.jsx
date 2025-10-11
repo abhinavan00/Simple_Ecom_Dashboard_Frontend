@@ -1,6 +1,7 @@
 import React, {useState} from "react";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
+import { motion } from "framer-motion";
 
 // Backend server URL
 const API_BASE_URL = 'http://localhost:3001';
@@ -67,10 +68,18 @@ const Register = () => {
 
     return (
         // Outer Container
-        <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
+        <motion.div 
+            className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8"
+            // Initial State
+            initial={{opacity: 0, y: 50, scale: 0.9}}
+            // Final State
+            animate={{opacity: 1, y: 0, scale: 1}}
+            // Transition Properties
+            transition={{duration: 0.5, ease: 'easeOut'}}
+        >
 
             {/* Form Card */}
-            <div className="w-full max-w-md bg-white p-8 rounded-xl shadow-2xl">
+            <div className="max-w-md w-full space-y-8 p-10 bg-white rounded-xl shadow-2xl z-10">
 
                 <h2 className="text-3xl font-bold text-gray-900 mb-6 text-center">
                     Create Your Account
@@ -135,14 +144,20 @@ const Register = () => {
                             placeholder="Minimum 6 Character"
                         />
                     </div>
-                    <button 
+                    <motion.button 
                         type="submit" 
                         className="w-full flex justify-center px-4 py-2 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition duration-150 ease-in-out cursor-pointer"
+                        // Animation on hover
+                        whileHover={{y: -4, boxShadow: "0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)"}}
+                        // Animation on Tap
+                        whileTap={{scale: 0.98}}
+                        // Transition Properties
+                        transition={{duration: 0.2}}
                         disabled={isLoading} // Disable the button while Loading 
                     >
                         {/* Display Loading text if in Progress */}
                         {isLoading? 'Registering...' : 'Register'}
-                    </button>
+                    </motion.button>
                 </form>
 
                 {/* Sign In Link */}
@@ -154,7 +169,7 @@ const Register = () => {
                 </p>
 
             </div>
-        </div>
+        </motion.div>
     )
 }
 
