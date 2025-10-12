@@ -3,6 +3,7 @@ import axios from "axios";
 import { data, useNavigate } from "react-router-dom";
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend } from "chart.js";
 import { Bar } from "react-chartjs-2";
+import { motion } from "framer-motion";
 
 // Register the Necessary components from chart.js
 ChartJS.register(
@@ -13,6 +14,26 @@ ChartJS.register(
     Tooltip,
     Legend
 )
+
+// Variants for Parent container (The Grid)
+const containerVariants = {
+    // Hidden State
+    hidden: {opacity: 0},
+    visible: {
+        opacity: 1,
+        transition: {
+            staggerChildren: 0.2
+        }
+    }
+}
+
+// Variants for the child items
+const itemsVariants = {
+    // Hidden State
+    hidden: {y: 20, opacity: 0},
+    // Visible State
+    visible: {y: 0, opacity: 1}
+}
 
 // Backend server URL
 const API_BASE_URL = 'http://localhost:3001';
@@ -34,7 +55,7 @@ const Dashboard = () => {
         try {
             // Make authenticated request to /dashboard route
             // Set `withCredentials: true` to send cookie
-            const response = await axios.get(`${API_BASE_URL}`, {
+            const response = await axios.get(`${API_BASE_URL}/api/dashboard/data`, {
                 withCredentials: true,
             });
             
@@ -65,7 +86,7 @@ const Dashboard = () => {
 
     // --- RENDERING LOGIC ---
     if (loading) {
-        return <div className="min-h-screen flex items-center justify center bg-gray-100 text-lg">Loading Dashboard Data...</div>
+        return <div className="min-h-screen flex items-center justify-center bg-gray-100 text-lg">Loading Dashboard Data...</div>
     }
 
     if (error) {
@@ -226,7 +247,15 @@ const Dashboard = () => {
     } 
 
     return (
-        <div className="min-h-screen bg-gray-50 p-8">
+        <motion.div 
+            className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8"
+            // Applying the Parent Variants
+            variants={containerVariants}
+            // Initial Stat
+            initial="hidden"
+            // Final State
+            animate="visible"
+        >
 
             {/* HEADER STRUCTURE */}
             <header className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 border-b pb-4">
@@ -250,27 +279,37 @@ const Dashboard = () => {
             </header>
 
             {/* Dashboard Metrics Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-3 gap-6">
+            <div className="mt-8 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
 
                 {/* Card 1: Total Sales */}
-                <div className="bg-white p-6 rounded-xl shadow-lg border-l-4 border-indigo-500">
+                <motion.div 
+                    className="bg-white p-6 rounded-xl shadow-lg border-l-4 border-indigo-500"
+                    // Applying Items variants
+                    variants={itemsVariants}
+                >
                     <p className="text-sm font-medium text-gray-500">Total Sales Shopify</p>
-                    <p className="mt-1 text-3xl font-bold text-gray-900">{formatCurrency(metrics.TotalSales)}</p>
-                </div>
+                    <p className="mt-1 text-3xl font-semibold text-gray-900">{`$${metrics.TotalSales}`}</p>
+                </motion.div>
 
                 {/* Card 2: Total Ad Spend */}
-                <div className="bg-white p-6 rounded-xl shadow-lg border-l-4 border-pink-500">
+                <motion.div 
+                    className="bg-white p-6 rounded-xl shadow-lg border-l-4 border-pink-500"
+                    variants={itemsVariants}
+                >
                     <p className="text-sm font-medium text-gray-500">Total Ad Spend (Meta & Google)</p>
-                    <p className="mt-1 text-3xl font-bold text-gray-900">{formatCurrency(metrics.TotalAdSpend)}</p>
-                </div>
+                    <p className="mt-1 text-3xl font-semibold text-gray-900">{`$${metrics.TotalAdSpend}`}</p>
+                </motion.div>
 
                 {/* Card 3: ROAS */}
-                <div className="bg-white p-6 rounded-xl shadow-lg border-l-4 border-green-500">
+                <motion.div 
+                    className="bg-white p-6 rounded-xl shadow-lg border-l-4 border-green-500"
+                    variants={itemsVariants}
+                >
                     <p className="text-sm font-medium text-gray-500">ROAS (Return on Ad Spend)</p>
-                    <p className="mt-1 text-3xl font-bold text-gray-900">
-                        {metrics.TotalAdSpend > 0 ? formatRoas(metrics.ROAS) : "N/A"}
+                    <p className="mt-1 text-3xl font-semibold text-gray-900">
+                        {metrics.TotalAdSpend > 0 ? metrics.ROAS : "N/A"}
                     </p>
-                </div>
+                </motion.div>
 
             </div>
 
@@ -278,15 +317,21 @@ const Dashboard = () => {
             <div className="mt-10 grid grid-cols-1 lg:grid-cols-2 gap-6">
 
                 {/* Left Side: Sales vs. Spend Chart (Bar) */}
-                <div className="bg-white p-6 rounded-xl shadow-2xl">
+                <motion.div 
+                    className="bg-white p-6 rounded-xl shadow-2xl"
+                    variants={itemsVariants}
+                >
                     <h3 className="text-xl font-bold text-gray-900 mb-4">Sales vs. Ad Spend</h3>
                     <div className="h-96">
                         <Bar data={chartData} options={chartOptions} />
                     </div>
-                </div>
+                </motion.div>
 
                 {/* Right Side: ROAS Visualization (Meter) */}
-                <div className="bg-white p-6 rounded-xl shadow-2xl">
+                <motion.div 
+                    className="bg-white p-6 rounded-xl shadow-2xl"
+                    variants={itemsVariants}
+                >
                         <h3 className="text-xl font-bold text-gray-900 mb-4">ROAS Goal Tracker</h3>
                         <div className="h-96 flex items-center justify-center">
                             {/* Display the ROAS value prominently */}
@@ -302,7 +347,7 @@ const Dashboard = () => {
                                 </div>
                             </div>
                         </div>
-                    </div>
+                    </motion.div>
 
             </div>
 
@@ -312,7 +357,7 @@ const Dashboard = () => {
                     <p className="text-sm">{dashboardData.message}</p>
                 </div>
             )}
-        </div>
+        </motion.div>
     )
 }
 
