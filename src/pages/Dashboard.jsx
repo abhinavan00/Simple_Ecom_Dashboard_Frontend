@@ -36,7 +36,7 @@ const itemsVariants = {
 }
 
 // Backend server URL
-const API_BASE_URL = 'http://localhost:3001';
+const API_BASE_URL = import.meta.env.VITE_BACKEND_URL;
 
 const Dashboard = () => {
     const [dashboardData, setDashboardData] = useState(null);

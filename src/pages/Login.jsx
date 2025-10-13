@@ -4,7 +4,7 @@ import axios from "axios";
 import { motion } from "framer-motion";
 
 // The URL for the backend server
-const API_BASE_URL = 'http://localhost:3001'; 
+const API_BASE_URL = import.meta.env.VITE_BACKEND_URL; 
 
 const Login = () => {
     // useNavigate hook to redirect the user
